@@ -1,10 +1,12 @@
 import 'package:dollar/exchange_rate/models/lebanon_dollar_rate.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/dom.dart' as dom;
 
 class ExchangeRateService {
   Future<LebanonRate> getWebsiteData() async {
-    final url = Uri.parse("https://cors-anywhere.herokuapp.com/https://lbprate.com/");
+    final urlPrefix = "https://cors-anywhere.herokuapp.com/";
+    final url = Uri.parse("${kIsWeb ? urlPrefix : ""}https://lbprate.com/");
     final response = await http.get(url);
     dom.Document html = dom.Document.html(response.body);
     final buyRateAndSell =
