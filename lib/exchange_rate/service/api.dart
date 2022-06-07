@@ -5,7 +5,7 @@ import 'package:html/dom.dart' as dom;
 
 class ExchangeRateService {
   Future<LebanonRate> getWebsiteData() async {
-    final urlPrefix = "https://cors-anywhere.herokuapp.com/";
+    const urlPrefix = "https://cors-anywhere.herokuapp.com/";
     final url = Uri.parse("${kIsWeb ? urlPrefix : ""}https://lbprate.com/");
     final response = await http.get(url);
     dom.Document html = dom.Document.html(response.body);
