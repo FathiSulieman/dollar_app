@@ -1,13 +1,11 @@
 import 'package:dollar/controllers/rate_screen_controller.dart';
-import 'package:dollar/extensions.dart';
-import 'package:dollar/themes/themes.dart';
+import 'package:dollar/drawer/screens/drawer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 
 class LebanonRateWidget extends StatelessWidget {
   const LebanonRateWidget({Key? key}) : super(key: key);
@@ -15,13 +13,15 @@ class LebanonRateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final RateController controller = Get.put(RateController());
-    return Scaffold(
+    return ThemeSwitchingArea(
+      key: key,
+      child: Scaffold(
         appBar: AppBar(
           centerTitle: false,
-          title: const Text(
-            "Dollar Today",
-            style: TextStyle(fontSize: 15),
-          ),
+          // title: const Text(
+          //   "Dollar Today",
+          //   style: TextStyle(fontSize: 15),
+          // ),
           actions: [
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
@@ -52,24 +52,16 @@ class LebanonRateWidget extends StatelessWidget {
                 ),
                 rateWidget("Sell", controller.rate.value!.sellRate.toString()),
                 rateWidget("Buy", controller.rate.value!.buyRate.toString()),
-                Expanded(
-                  child: Align(
-                    alignment: FractionalOffset.bottomRight,
-                    child: MaterialButton(
-                        onPressed: () => {
-                              Get.changeThemeMode(Get.isDarkMode
-                                  ? ThemeMode.light
-                                  : ThemeMode.dark)
-                            },
-                        child: const Text("")),
-                  ),
-                ),
+                
               ],
             );
           } else {
             return const Center(child: CircularProgressIndicator());
           }
-        }));
+        }),
+        drawer: const MainDrawer(),
+      ),
+    );
   }
 
   Padding rateWidget(String exchange, String rate) {

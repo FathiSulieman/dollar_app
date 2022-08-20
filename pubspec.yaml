@@ -51,6 +51,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
   flutter_launcher_icons: ^0.9.3
+  animated_theme_switcher: ^2.0.6
   
 flutter_icons:
   android: true
