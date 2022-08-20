@@ -1,39 +1,17 @@
-import 'package:dollar/exchange_rate/models/lebanon_dollar_rate.dart';
-import 'package:dollar/exchange_rate/service/api.dart';
+import 'package:dollar/controllers/rate_screen_controller.dart';
 import 'package:dollar/extensions.dart';
-import 'package:dollar/news/screens/news_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
-class LebanonRateWidget extends StatefulWidget {
+class LebanonRateWidget extends StatelessWidget {
   const LebanonRateWidget({Key? key}) : super(key: key);
 
   @override
-  State<LebanonRateWidget> createState() => _LebanonRateWidgetState();
-}
-
-class _LebanonRateWidgetState extends State<LebanonRateWidget> {
-  @override
-  void initState() {
-    super.initState();
-    fetchApi();
-  }
-
-  Future<void> fetchApi() async {
-    setState(() {
-      _loadingData = true;
-    });
-    _rate = await _exchangeRateService.getWebsiteData();
-    setState(() {
-      _loadingData = false;
-    });
-  }
-
-  bool _loadingData = false;
-  final ExchangeRateService _exchangeRateService = ExchangeRateService();
-  LebanonRate _rate =
-      LebanonRate(buyRate: "", lastUpdatedRate: "", sellRate: "");
-  @override
   Widget build(BuildContext context) {
+    final RateController controller = Get.put(RateController());
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -45,17 +23,17 @@ class _LebanonRateWidgetState extends State<LebanonRateWidget> {
         actions: [
           Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
-            child: Text(
-              _rate.lastUpdatedRate.toString(),
-              style: const TextStyle(fontSize: 15, color: Colors.white),
-            ),
+            child: Obx(() => Text(
+                  controller.rate.value != null
+                      ? controller.rate.value!.lastUpdatedRate.toString()
+                      : "",
+                  style: const TextStyle(fontSize: 15, color: Colors.white),
+                )),
           ),
           IconButton(
-              onPressed: _loadingData
-                  ? null
-                  : () async {
-                      await fetchApi();
-                    },
+              onPressed: () async {
+                await controller.fetchApi();
+              },
               icon: const Icon(
                 Icons.replay_outlined,
                 color: Colors.white,
@@ -68,58 +46,57 @@ class _LebanonRateWidgetState extends State<LebanonRateWidget> {
               color: HexColor.fromHex("#007bff"),
               height: MediaQuery.of(context).size.height * 0.25,
               width: MediaQuery.of(context).size.width,
-              child: _loadingData
-                  ? const Center(
+              child: GetBuilder<RateController>(builder: (_) {
+                if (_.rate.value != null) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "USD to LBP Exchange Rate",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Buy ${controller.rate.value!.buyRate}',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Sell ${controller.rate.value!.sellRate}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const Center(
                       child: CircularProgressIndicator(
-                      color: Colors.green,
-                    ))
-                  : Padding(
-                      padding: const EdgeInsets.only(top: 30),
-                      child: Column(
-                        children: [
-                          const Text(
-                            "USD to LBP Exchange Rate",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Buy ${_rate.buyRate}',
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Sell ${_rate.sellRate}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
-          // const Expanded(
-          //   flex: 1,
-          //   child: NewsWidget(),
-          // )
+                    color: Colors.green,
+                  ));
+                }
+              })),
           Expanded(
             child: Align(
               alignment: FractionalOffset.bottomRight,
-              child: MaterialButton(
-                  onPressed: () => {}, child: const Text("The Greatest!")),
+              child: MaterialButton(onPressed: () => {}, child: const Text("")),
             ),
           ),
         ],
